@@ -1,0 +1,1265 @@
+{% extends "base.html" %} {% block content %}
+
+<style>
+    /* ===== DASHBOARD SPECIFIC ===== */
+
+    /* --- Header Section --- */
+    .dashboard-hero {
+        position: relative;
+        margin-bottom: 2.5rem;
+        padding-bottom: 2.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .dashboard-hero::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 120px;
+        height: 1px;
+        background: var(--gradient-primary);
+    }
+
+    .page-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(215, 153, 33, 0.08);
+        border: 1px solid rgba(215, 153, 33, 0.2);
+        color: var(--primary-light);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.35rem 0.85rem;
+        border-radius: 100px;
+        margin-bottom: 1rem;
+    }
+
+    .page-eyebrow .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--success-green);
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(152, 151, 26, 0.7);
+        animation: pulseGreenDot 2s infinite;
+    }
+
+    @keyframes pulseGreenDot {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    .page-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 5vw, 3rem);
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* --- Stats Strip --- */
+    .stats-strip {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+
+    .stat-chip {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.65rem 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-chip:hover {
+        border-color: rgba(215, 153, 33, 0.3);
+        background: rgba(215, 153, 33, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .stat-chip-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .stat-chip-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-main);
+        line-height: 1;
+    }
+
+    .stat-chip-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+    }
+
+    /* --- Add Product Bar --- */
+    .add-product-section {
+        margin-bottom: 3rem;
+    }
+
+    .add-product-bar {
+        background: linear-gradient(
+            135deg,
+            rgba(215, 153, 33, 0.06) 0%,
+            rgba(177, 98, 134, 0.04) 100%
+        );
+        border: 1px solid rgba(215, 153, 33, 0.2);
+        border-radius: 20px;
+        padding: 1.75rem 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 40px rgba(215, 153, 33, 0.05);
+    }
+
+    .add-product-bar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(215, 153, 33, 0.5),
+            transparent
+        );
+    }
+
+    .add-product-bar:focus-within {
+        border-color: rgba(215, 153, 33, 0.45);
+        box-shadow: 0 0 60px rgba(215, 153, 33, 0.1);
+    }
+
+    .add-bar-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--primary-light);
+        margin-bottom: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .add-input-group {
+        display: flex;
+        align-items: center;
+        background: rgba(40, 40, 40, 0.7);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.25rem 0.5rem 0.25rem 1rem;
+        gap: 0.5rem;
+        transition: all 0.25s ease;
+    }
+
+    .add-input-group:focus-within {
+        border-color: var(--primary-accent);
+        box-shadow: 0 0 0 3px rgba(215, 153, 33, 0.12);
+    }
+
+    .add-input-group .form-control {
+        background: transparent;
+        border: none;
+        padding: 0.65rem 0.5rem;
+        border-radius: 0;
+        box-shadow: none !important;
+    }
+
+    .add-input-group .form-control:focus {
+        border: none;
+        box-shadow: none !important;
+        background: transparent;
+    }
+
+    .add-input-group .input-divider {
+        width: 1px;
+        height: 24px;
+        background: var(--border-color);
+        flex-shrink: 0;
+    }
+
+    .add-input-group .currency-symbol {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+        padding: 0 0.25rem;
+    }
+
+    .add-input-group .price-input {
+        max-width: 140px;
+    }
+
+    /* --- Section Header --- */
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--text-soft);
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .section-title::before {
+        content: "";
+        width: 3px;
+        height: 16px;
+        background: var(--gradient-primary);
+        border-radius: 4px;
+    }
+
+    .sort-chips {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .sort-chip {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.3rem 0.7rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .sort-chip:hover,
+    .sort-chip.active {
+        color: var(--primary-light);
+        border-color: rgba(215, 153, 33, 0.3);
+        background: rgba(215, 153, 33, 0.06);
+    }
+
+    /* --- Product Cards --- */
+    .product-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        height: 100%;
+    }
+
+    .product-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(215, 153, 33, 0.3),
+            transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(215, 153, 33, 0.25);
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(215, 153, 33, 0.1),
+            var(--glow-primary);
+    }
+
+    .product-card:hover::before {
+        opacity: 1;
+    }
+
+    /* TASK 4: Card Color States */
+
+    /* State: Deal Hit */
+    .product-card.is-deal {
+        border-color: rgba(152, 151, 26, 0.3);
+        background: linear-gradient(
+            135deg,
+            rgba(152, 151, 26, 0.04) 0%,
+            var(--bg-card) 60%
+        );
+    }
+    .product-card.is-deal::before {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(152, 151, 26, 0.4),
+            transparent
+        );
+        opacity: 1;
+    }
+    .product-card.is-deal:hover {
+        border-color: rgba(152, 151, 26, 0.5);
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(152, 151, 26, 0.15),
+            var(--glow-success);
+    }
+
+    /* State: Pending */
+    .product-card.is-pending {
+        border-color: rgba(250, 189, 47, 0.3);
+        background: linear-gradient(
+            135deg,
+            rgba(250, 189, 47, 0.03) 0%,
+            var(--bg-card) 60%
+        );
+    }
+    .product-card.is-pending::before {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(250, 189, 47, 0.4),
+            transparent
+        );
+        opacity: 1;
+    }
+    .product-card.is-pending:hover {
+        border-color: rgba(250, 189, 47, 0.5);
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(250, 189, 47, 0.15),
+            0 0 30px rgba(250, 189, 47, 0.1);
+    }
+
+    /* State: Failed */
+    .product-card.is-failed {
+        border-color: rgba(251, 73, 52, 0.3);
+        background: linear-gradient(
+            135deg,
+            rgba(251, 73, 52, 0.03) 0%,
+            var(--bg-card) 60%
+        );
+    }
+    .product-card.is-failed::before {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(251, 73, 52, 0.4),
+            transparent
+        );
+        opacity: 1;
+    }
+    .product-card.is-failed:hover {
+        border-color: rgba(251, 73, 52, 0.5);
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(251, 73, 52, 0.15),
+            0 0 30px rgba(251, 73, 52, 0.15);
+    }
+
+    /* --- Card Number Badge --- */
+    .card-index-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 26px;
+        height: 26px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        font-family: "Space Grotesk", sans-serif;
+    }
+
+    /* --- Card Body --- */
+    .card-body-inner {
+        padding: 1.5rem 1.5rem 1rem;
+        flex: 1;
+    }
+
+    /* --- Product Title Area --- */
+    .product-title-area {
+        margin-bottom: 1.25rem;
+        padding-right: 2rem;
+    }
+
+    .retailer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .card-product-title {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* --- Price Panel --- */
+    .price-panel {
+        background: rgba(29, 32, 33, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 14px;
+        padding: 1.25rem;
+        margin-bottom: 1.1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .price-panel::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(
+            circle,
+            rgba(215, 153, 33, 0.06) 0%,
+            transparent 70%
+        );
+        pointer-events: none;
+    }
+
+    .price-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 0.3rem;
+    }
+
+    .price-current {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 2.1rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: var(--text-main);
+    }
+
+    .price-current.is-deal-price {
+        color: var(--success-green);
+        text-shadow: 0 0 20px rgba(152, 151, 26, 0.3);
+    }
+
+    .price-target-display {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-soft);
+    }
+
+    /* Savings Badge */
+    .savings-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(152, 151, 26, 0.1);
+        border: 1px solid rgba(152, 151, 26, 0.2);
+        color: var(--success-green);
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.25rem 0.6rem;
+        border-radius: 100px;
+        margin-top: 0.4rem;
+    }
+
+    /* --- Progress Bar --- */
+    .price-progress-wrap {
+        margin-top: 1.1rem;
+    }
+
+    .progress-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-label {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .progress-percent {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--primary-light);
+        font-family: "Space Grotesk", sans-serif;
+    }
+
+    .progress-percent.success {
+        color: var(--success-green);
+    }
+
+    .price-progress-container {
+        height: 5px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .price-progress-bar {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bar-standard {
+        background: var(--gradient-primary);
+        box-shadow: 0 0 10px rgba(215, 153, 33, 0.4);
+    }
+
+    .bar-success {
+        background: var(--gradient-success);
+        box-shadow: 0 0 10px rgba(152, 151, 26, 0.4);
+    }
+
+    /* --- Deal Alert Banner --- */
+    .deal-alert-banner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        background: rgba(152, 151, 26, 0.08);
+        border: 1px solid rgba(152, 151, 26, 0.25);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--success-green);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        animation: pulseGreen 2.5s ease-in-out infinite;
+        margin-bottom: 1rem;
+    }
+
+    .deal-alert-banner .deal-icon {
+        font-size: 1rem;
+        animation: float 2s ease-in-out infinite;
+    }
+
+    /* --- Product URL Chip --- */
+    .product-url-area {
+        padding: 0 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .product-link-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 0.3rem 0.75rem;
+        border-radius: 100px;
+        font-size: 0.72rem;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+    }
+
+    .product-link-chip:hover {
+        background: rgba(215, 153, 33, 0.08);
+        color: var(--primary-light);
+        border-color: rgba(215, 153, 33, 0.3);
+        transform: translateX(2px);
+    }
+
+    .product-link-chip .chip-icon {
+        flex-shrink: 0;
+    }
+
+    /* --- Card Footer --- */
+    .card-footer-bar {
+        padding: 0.9rem 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+        background: rgba(29, 32, 33, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .meta-time {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .meta-time .time-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--success-green);
+        border-radius: 50%;
+        opacity: 0.7;
+    }
+
+    .btn-delete-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: all 0.25s ease;
+        font-size: 0.85rem;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    .btn-delete-icon:hover {
+        color: var(--danger-red);
+        background: rgba(251, 73, 52, 0.08);
+        border-color: rgba(251, 73, 52, 0.3);
+        transform: scale(1.05);
+    }
+
+    /* --- Fetching State --- */
+    .fetching-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(215, 153, 33, 0.08);
+        border: 1px solid rgba(215, 153, 33, 0.2);
+        color: var(--primary-light);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 100px;
+        letter-spacing: 0.05em;
+    }
+
+    .fetching-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        animation: pulseGreenDot 1s infinite;
+    }
+
+    /* --- Failed State Badge --- */
+    .failed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(251, 73, 52, 0.08);
+        border: 1px solid rgba(251, 73, 52, 0.2);
+        color: var(--danger-red);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 100px;
+        letter-spacing: 0.05em;
+    }
+
+    /* --- Empty State --- */
+    .empty-state-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5rem 2rem;
+        text-align: center;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .empty-icon-ring {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: rgba(215, 153, 33, 0.06);
+        border: 2px dashed rgba(215, 153, 33, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+        color: rgba(215, 153, 33, 0.4);
+        animation: float 4s ease-in-out infinite;
+    }
+
+    .empty-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 1.6rem;
+        letter-spacing: -0.03em;
+        color: var(--text-main);
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        max-width: 380px;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+
+    /* --- Card Stagger Animations --- */
+    .product-col:nth-child(1) .product-card {
+        animation: fadeInUp 0.5s 0.05s ease both;
+    }
+    .product-col:nth-child(2) .product-card {
+        animation: fadeInUp 0.5s 0.1s ease both;
+    }
+    .product-col:nth-child(3) .product-card {
+        animation: fadeInUp 0.5s 0.15s ease both;
+    }
+    .product-col:nth-child(4) .product-card {
+        animation: fadeInUp 0.5s 0.2s ease both;
+    }
+    .product-col:nth-child(5) .product-card {
+        animation: fadeInUp 0.5s 0.25s ease both;
+    }
+    .product-col:nth-child(6) .product-card {
+        animation: fadeInUp 0.5s 0.3s ease both;
+    }
+    .product-col:nth-child(n + 7) .product-card {
+        animation: fadeInUp 0.5s 0.35s ease both;
+    }
+</style>
+
+<div class="dashboard-hero animate-fade-in">
+    <div
+        class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-4"
+    >
+        <div>
+            <div class="page-eyebrow">
+                <span class="dot"></span>
+                Live Price Monitoring
+            </div>
+            <h1 class="page-title">
+                Deal <span class="text-gradient">Dashboard</span>
+            </h1>
+            <p class="page-subtitle">
+                <i
+                    class="bi bi-shield-check"
+                    style="color: var(--success-green)"
+                ></i>
+                Actively tracking
+                <strong style="color: var(--text-main); font-weight: 700">
+                    {{ products|length }}
+                </strong>
+                {{ 'item' if products|length == 1 else 'items' }} across
+                retailers
+            </p>
+        </div>
+
+        <div class="stats-strip">
+            {% set deal_count = products | selectattr('current_price', '!=',
+            none) | selectattr('current_price', 'le', products |
+            map(attribute='target_price') | list | first | default(0)) | list |
+            length %}
+
+            <div class="stat-chip">
+                <div
+                    class="stat-chip-icon"
+                    style="background: rgba(215, 153, 33, 0.12)"
+                >
+                    <i
+                        class="bi bi-collection"
+                        style="color: var(--primary-light); font-size: 0.85rem"
+                    ></i>
+                </div>
+                <div>
+                    <div class="stat-chip-value">{{ products|length }}</div>
+                    <div class="stat-chip-label">Tracked</div>
+                </div>
+            </div>
+
+            <div class="stat-chip">
+                <div
+                    class="stat-chip-icon"
+                    style="background: rgba(152, 151, 26, 0.12)"
+                >
+                    <i
+                        class="bi bi-lightning-charge-fill"
+                        style="color: var(--success-green); font-size: 0.85rem"
+                    ></i>
+                </div>
+                <div>
+                    <div class="stat-chip-value">
+                        {% set ns = namespace(deals=0) %} {% for p in products
+                        %} {% if p.current_price is not none and p.current_price
+                        <= p.target_price %} {% set ns.deals = ns.deals + 1 %}
+                        {% endif %} {% endfor %} {{ ns.deals }}
+                    </div>
+                    <div class="stat-chip-label">Deals Hit</div>
+                </div>
+            </div>
+
+            <div class="stat-chip">
+                <div
+                    class="stat-chip-icon"
+                    style="background: rgba(250, 189, 47, 0.12)"
+                >
+                    <i
+                        class="bi bi-graph-down-arrow"
+                        style="color: var(--warning-amber); font-size: 0.85rem"
+                    ></i>
+                </div>
+                <div>
+                    <div class="stat-chip-value">
+                        {% set ns2 = namespace(pending=0) %} {% for p in
+                        products %} {% if p.current_price is none %} {% set
+                        ns2.pending = ns2.pending + 1 %} {% endif %} {% endfor
+                        %} {{ ns2.pending }}
+                    </div>
+                    <div class="stat-chip-label">Pending</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="add-product-section">
+    <div class="add-product-bar">
+        <div class="add-bar-label">
+            <i class="bi bi-plus-circle-fill" style="font-size: 0.85rem"></i>
+            Track a New Product
+        </div>
+        <form method="post" id="trackForm">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-7">
+                    <div class="add-input-group">
+                        <i
+                            class="bi bi-link-45deg"
+                            style="
+                                color: var(--primary-light);
+                                font-size: 1.1rem;
+                                flex-shrink: 0;
+                            "
+                        ></i>
+                        <input
+                            type="url"
+                            id="urlInput"
+                            name="url"
+                            class="form-control"
+                            placeholder="Paste a product URL from Amazon, Flipkart..."
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="add-input-group">
+                        <span class="currency-symbol">₹</span>
+                        <div class="input-divider"></div>
+                        <input
+                            type="number"
+                            id="targetPrice"
+                            step="0.01"
+                            name="target_price"
+                            class="form-control price-input"
+                            placeholder="Alert price"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="col-lg-2">
+                    <button
+                        type="submit"
+                        id="trackBtn"
+                        class="btn btn-premium-gradient w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+                        style="
+                            border-radius: 12px;
+                            height: 48px;
+                            font-weight: 700;
+                            font-size: 0.9rem;
+                        "
+                    >
+                        <i class="bi bi-plus-lg" id="trackBtnIcon"></i>
+                        <span id="trackBtnText">Track</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if products %}
+<div class="section-header">
+    <div class="section-title">Monitored Products</div>
+    <div class="sort-chips">
+        <span class="sort-chip active">All</span>
+        <span class="sort-chip">Deals</span>
+        <span class="sort-chip">Recent</span>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4" id="productsContainer">
+    {% for p in products %} {% set is_deal = false %} {% if p.current_price is
+    not none and p.current_price <= p.target_price %} {% set is_deal = true %}
+    {% endif %} {% set state_class = '' %} {% if "Failed to load" in
+    p.product_name %} {% set state_class = 'is-failed' %} {% elif
+    p.current_price is none %} {% set state_class = 'is-pending' %} {% elif
+    is_deal %} {% set state_class = 'is-deal' %} {% else %} {% set state_class =
+    'is-tracked' %} {% endif %} {% set bar_pct = 0 %} {% if is_deal %} {% set
+    bar_pct = 100 %} {% elif p.current_price is not none and p.current_price > 0
+    %} {% set gap = p.current_price - p.target_price %} {% if gap <= 0 %} {% set
+    bar_pct = 100 %} {% elif gap >= p.target_price %} {% set bar_pct = 5 %} {%
+    else %} {% set bar_pct = [100 - ((gap / p.target_price) * 100), 5] | max %}
+    {% endif %} {% endif %} {% set savings = 0 %} {% if is_deal and
+    p.current_price is not none %} {% set savings = p.target_price -
+    p.current_price %} {% endif %}
+
+    <div class="col-md-6 col-xl-4 product-col">
+        <div class="product-card {{ state_class }}">
+            <div class="card-index-badge">{{ loop.index }}</div>
+
+            <div class="card-body-inner">
+                <div class="product-title-area">
+                    <div class="retailer-badge">
+                        <i class="bi bi-shop" style="font-size: 0.75rem"></i>
+                        {% if 'amazon' in p.url %}Amazon{% elif 'flipkart' in
+                        p.url %}Flipkart{% elif 'myntra' in p.url %}Myntra{%
+                        else %}Retailer{% endif %}
+                    </div>
+                    <h5 class="card-product-title" title="{{ p.product_name }}">
+                        {{ p.product_name }}
+                    </h5>
+                </div>
+
+                {% if is_deal %}
+                <div class="deal-alert-banner">
+                    <span class="deal-icon"
+                        ><i class="bi bi-lightning-charge-fill"></i
+                    ></span>
+                    Price Drop Detected! {% if savings > 0 %}
+                    <span
+                        class="savings-badge"
+                        style="margin-top: 0; margin-left: 0.4rem"
+                    >
+                        <i class="bi bi-arrow-down"></i>
+                        ₹{{ savings | round(2) }} below target
+                    </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="price-panel">
+                    <div
+                        class="d-flex justify-content-between align-items-start gap-2"
+                    >
+                        <div>
+                            <div class="price-label">Current Price</div>
+                            {% if p.current_price is not none %}
+                            <div
+                                class="price-current {% if is_deal %}is-deal-price{% endif %}"
+                            >
+                                ₹{{ p.current_price | round(2) }}
+                            </div>
+                            {% if is_deal and savings > 0 %}
+                            <div class="savings-badge">
+                                <i class="bi bi-check2"></i>
+                                Below target!
+                            </div>
+                            {% endif %} {% elif "Failed to load" in
+                            p.product_name %}
+                            <div class="failed-badge mt-1">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Failed
+                            </div>
+                            {% else %}
+                            <div class="fetching-badge mt-1">
+                                <span class="fetching-dot"></span>
+                                Fetching...
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-end">
+                            <div class="price-label">Alert Price</div>
+                            <div class="price-target-display">
+                                ₹{{ p.target_price | round(2) }}
+                            </div>
+                            <div
+                                style="
+                                    font-size: 0.65rem;
+                                    color: var(--text-muted);
+                                    margin-top: 0.2rem;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.06em;
+                                    font-weight: 600;
+                                "
+                            >
+                                Target
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if p.current_price is not none %}
+                    <div class="price-progress-wrap">
+                        <div class="progress-meta">
+                            <span class="progress-label">
+                                {% if is_deal %}Goal Reached{% else %}Price
+                                Proximity{% endif %}
+                            </span>
+                            <span
+                                class="progress-percent {% if is_deal %}success{% endif %}"
+                            >
+                                {{ bar_pct | round(0) | int }}%
+                            </span>
+                        </div>
+                        <div class="price-progress-container">
+                            <div
+                                class="price-progress-bar {% if is_deal %}bar-success{% else %}bar-standard{% endif %}"
+                                style="width: {{ bar_pct }}%;"
+                            ></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="product-url-area">
+                <a
+                    href="{{ p.url }}"
+                    target="_blank"
+                    class="product-link-chip"
+                    title="{{ p.url }}"
+                >
+                    <i class="bi bi-box-arrow-up-right chip-icon"></i>
+                    <span>{{ p.url | truncate(50) }}</span>
+                </a>
+            </div>
+
+            <div class="card-footer-bar">
+                <div class="meta-time">
+                    {% if p.last_checked %}
+                    <span
+                        class="time-dot {% if 'Failed to load' in p.product_name %}bg-danger{% endif %}"
+                    ></span>
+                    Updated {{ p.last_checked.strftime('%d %b, %H:%M') }} {%
+                    else %}
+                    <i
+                        class="bi bi-hourglass-split"
+                        style="font-size: 0.75rem; color: var(--warning-amber)"
+                    ></i>
+                    Pending sync {% endif %}
+                </div>
+
+                <a
+                    href="{{ url_for('main.delete', id=p.id) }}"
+                    onclick="return confirm('Stop tracking this item?');"
+                    class="btn-delete-icon"
+                    title="Remove from tracking"
+                >
+                    <i class="bi bi-trash3"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="col-12">
+        <div class="empty-state-wrapper">
+            <div class="empty-icon-ring">
+                <i class="bi bi-radar"></i>
+            </div>
+            <h3 class="empty-title">No Items Being Tracked</h3>
+            <p class="empty-subtitle">
+                Your deal radar is ready to go. Paste a product URL above and
+                set a target price to begin monitoring real-time price drops.
+            </p>
+            <label
+                for="urlInput"
+                class="btn btn-premium-gradient px-5 py-3"
+                style="
+                    font-size: 0.9rem;
+                    font-weight: 700;
+                    border-radius: 12px;
+                    cursor: pointer;
+                "
+            >
+                <i class="bi bi-plus-lg me-2"></i>
+                Track Your First Product
+            </label>
+            <div
+                class="d-flex align-items-center gap-2 mt-4"
+                style="font-size: 0.75rem; color: var(--text-muted)"
+            >
+                <i
+                    class="bi bi-shield-check"
+                    style="color: var(--success-green)"
+                ></i>
+                Supports Amazon, Flipkart & more
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- TASK 3: LOADING ANIMATION ---
+        const trackForm = document.getElementById("trackForm");
+
+        if (trackForm) {
+            trackForm.addEventListener("submit", function () {
+                const btn = document.getElementById("trackBtn");
+
+                btn.disabled = true;
+                btn.style.opacity = "0.9";
+                btn.style.cursor = "not-allowed";
+
+                const loadingStates = [
+                    "Initializing Engine...",
+                    "Bypassing Security...",
+                    "Analyzing DOM...",
+                    "AI Parsing Data...",
+                    "Finalizing...",
+                ];
+
+                let currentStep = 0;
+
+                btn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" style="color: var(--text-main);"></span>
+                <span id="dynamicLoadText" style="font-size: 0.85rem; color: var(--text-main);">${loadingStates[0]}</span>
+            `;
+
+                setInterval(() => {
+                    currentStep++;
+                    if (currentStep < loadingStates.length) {
+                        const textEl =
+                            document.getElementById("dynamicLoadText");
+                        if (textEl)
+                            textEl.innerText = loadingStates[currentStep];
+                    }
+                }, 3000);
+            });
+        }
+
+        // --- TASK 5: FILTERS & SORTING ENGINE ---
+        const filterChips = document.querySelectorAll(".sort-chip");
+        const productCols = document.querySelectorAll(".product-col");
+
+        if (filterChips.length > 0 && productCols.length > 0) {
+            filterChips.forEach((chip) => {
+                chip.addEventListener("click", function () {
+                    // 1. Visually update active chip state
+                    filterChips.forEach((c) => c.classList.remove("active"));
+                    this.classList.add("active");
+
+                    // 2. Identify which filter was clicked
+                    const filterType = this.innerText.trim().toLowerCase();
+
+                    // 3. Loop through grid and apply logic
+                    productCols.forEach((col, index) => {
+                        // Reset to default standard state before applying new filter
+                        col.style.display = "";
+                        col.style.order = "0";
+
+                        if (filterType === "deals") {
+                            // Hide columns that do not contain a card with the 'is-deal' class
+                            const isDeal = col
+                                .querySelector(".product-card")
+                                .classList.contains("is-deal");
+                            if (!isDeal) {
+                                col.style.display = "none";
+                            }
+                        } else if (filterType === "recent") {
+                            // Reverse the CSS Flexbox order so newest items appear at the top
+                            col.style.order = productCols.length - index;
+                        }
+                        // If 'all', do nothing because we already reset defaults above
+                    });
+                });
+            });
+        }
+    });
+</script>
+
+{% endblock %}

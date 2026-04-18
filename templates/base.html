@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Bargain Hunter Premium | Precision Deal Tracking</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        />
+
+        <style>
+            :root {
+                /* Core Backgrounds (Gruvbox Dark) */
+                --bg-body: #282828;
+                --bg-card: #3c3836;
+                --bg-card-hover: #504945;
+                --bg-glass: rgba(60, 56, 54, 0.85);
+                --bg-input: rgba(235, 219, 178, 0.03);
+
+                /* Borders */
+                --border-color: #504945;
+                --border-hover: rgba(215, 153, 33, 0.5);
+
+                /* Text */
+                --text-main: #ebdbb2;
+                --text-muted: #a89984;
+                --text-soft: #d5c4a1;
+
+                /* Premium Gradient System */
+                --gradient-primary: linear-gradient(
+                    135deg,
+                    #d79921 0%,
+                    #d65d0e 50%,
+                    #af3a03 100%
+                );
+                --gradient-aurora: linear-gradient(
+                    135deg,
+                    #458588 0%,
+                    #b16286 40%,
+                    #cc241d 100%
+                );
+                --gradient-success: linear-gradient(
+                    135deg,
+                    #98971a 0%,
+                    #689d6a 100%
+                );
+                --gradient-gold: linear-gradient(
+                    135deg,
+                    #fabd2f 0%,
+                    #d79921 100%
+                );
+
+                /* Accent Colors */
+                --primary-accent: #d79921;
+                --primary-light: #fabd2f;
+                --success-green: #b8bb26;
+                --danger-red: #fb4934;
+                --warning-amber: #fabd2f;
+
+                /* Glow Effects */
+                --glow-primary: 0 0 40px rgba(215, 153, 33, 0.15);
+                --glow-success: 0 0 40px rgba(152, 151, 26, 0.15);
+                --glow-card: 0 20px 60px rgba(29, 32, 33, 0.6);
+            }
+
+            /* ===== SCROLLBAR ===== */
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--bg-body);
+            }
+            ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #d79921, #d65d0e);
+                border-radius: 10px;
+            }
+
+            /* ===== BASE ===== */
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: var(--bg-body);
+                color: var(--text-main);
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                letter-spacing: -0.01em;
+                overflow-x: hidden;
+            }
+
+            /* ===== BACKGROUND AMBIENT ===== */
+            body::before {
+                content: "";
+                position: fixed;
+                top: -30%;
+                left: -20%;
+                width: 60%;
+                height: 60%;
+                background: radial-gradient(
+                    ellipse,
+                    rgba(215, 153, 33, 0.08) 0%,
+                    transparent 70%
+                );
+                pointer-events: none;
+                z-index: 0;
+                animation: ambientShift 12s ease-in-out infinite alternate;
+            }
+
+            body::after {
+                content: "";
+                position: fixed;
+                bottom: -20%;
+                right: -10%;
+                width: 50%;
+                height: 50%;
+                background: radial-gradient(
+                    ellipse,
+                    rgba(177, 98, 134, 0.06) 0%,
+                    transparent 70%
+                );
+                pointer-events: none;
+                z-index: 0;
+                animation: ambientShift 15s ease-in-out infinite
+                    alternate-reverse;
+            }
+
+            @keyframes ambientShift {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                }
+                100% {
+                    transform: translate(3%, 5%) scale(1.1);
+                }
+            }
+
+            /* ===== ANIMATIONS ===== */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes fadeInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes pulseGradient {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(215, 153, 33, 0.5);
+                }
+                70% {
+                    box-shadow: 0 0 0 12px rgba(215, 153, 33, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(215, 153, 33, 0);
+                }
+            }
+
+            @keyframes pulseGreen {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(152, 151, 26, 0.5);
+                }
+                70% {
+                    box-shadow: 0 0 0 10px rgba(152, 151, 26, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(152, 151, 26, 0);
+                }
+            }
+
+            @keyframes shimmer {
+                0% {
+                    background-position: -200% center;
+                }
+                100% {
+                    background-position: 200% center;
+                }
+            }
+
+            @keyframes borderGlow {
+                0%,
+                100% {
+                    border-color: rgba(215, 153, 33, 0.3);
+                }
+                50% {
+                    border-color: rgba(177, 98, 134, 0.7);
+                }
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-8px);
+                }
+            }
+
+            @keyframes rotateIcon {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .animate-fade-in {
+                animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            /* ===== NAVBAR ===== */
+            .navbar-premium {
+                background: rgba(40, 40, 40, 0.75);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.875rem 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                animation: fadeInDown 0.5s ease forwards;
+            }
+
+            .navbar-premium::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40%;
+                height: 1px;
+                background: var(--gradient-primary);
+                opacity: 0.4;
+            }
+
+            .navbar-brand {
+                font-family: "Space Grotesk", sans-serif;
+                font-weight: 700;
+                font-size: 1.4rem;
+                background: var(--gradient-aurora);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: -0.03em;
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                text-decoration: none;
+            }
+
+            .navbar-brand .brand-icon {
+                width: 34px;
+                height: 34px;
+                background: var(--gradient-primary);
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                color: white;
+                -webkit-text-fill-color: white;
+                box-shadow: 0 4px 15px rgba(215, 153, 33, 0.4);
+                flex-shrink: 0;
+            }
+
+            .nav-pill-badge {
+                background: rgba(215, 153, 33, 0.1);
+                border: 1px solid rgba(215, 153, 33, 0.25);
+                color: var(--primary-light);
+                font-size: 0.65rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                padding: 0.2rem 0.5rem;
+                border-radius: 100px;
+                margin-left: 0.5rem;
+                -webkit-text-fill-color: var(--primary-light);
+            }
+
+            /* ===== BUTTONS ===== */
+            .btn-premium-outline {
+                color: var(--text-soft);
+                border: 1px solid var(--border-color);
+                background: rgba(255, 255, 255, 0.03);
+                border-radius: 10px;
+                font-weight: 500;
+                font-size: 0.875rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-premium-outline::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: var(--gradient-primary);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                border-radius: inherit;
+            }
+
+            .btn-premium-outline:hover {
+                border-color: var(--primary-accent);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(215, 153, 33, 0.25);
+            }
+
+            .btn-premium-outline:hover::before {
+                opacity: 0.08;
+            }
+
+            .btn-premium-gradient {
+                background: var(--gradient-primary);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-weight: 600;
+                font-size: 0.875rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-premium-gradient::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 200%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.15),
+                    transparent
+                );
+                transition: left 0.5s ease;
+            }
+
+            .btn-premium-gradient:hover {
+                box-shadow: 0 8px 30px rgba(215, 153, 33, 0.5);
+                transform: translateY(-2px);
+                color: white;
+            }
+
+            .btn-premium-gradient:hover::before {
+                left: 100%;
+            }
+
+            .btn-sync {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.55rem 1.25rem;
+            }
+
+            .btn-sync .sync-icon {
+                transition: transform 0.5s ease;
+                display: inline-block;
+            }
+
+            .btn-sync:hover .sync-icon {
+                animation: rotateIcon 0.8s linear infinite;
+            }
+
+            /* ===== FORM CONTROLS ===== */
+            .form-control {
+                background-color: var(--bg-input);
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                border-radius: 10px;
+                padding: 0.75rem 1rem;
+                transition: all 0.25s ease;
+                font-size: 0.9rem;
+            }
+
+            .form-control:focus {
+                background-color: rgba(255, 255, 255, 0.05);
+                border-color: var(--primary-accent);
+                box-shadow:
+                    0 0 0 3px rgba(215, 153, 33, 0.15),
+                    var(--glow-primary);
+                color: var(--text-main);
+                outline: none;
+            }
+
+            .form-control::placeholder {
+                color: var(--text-muted);
+            }
+
+            /* ===== ALERTS ===== */
+            .alert-premium {
+                background: var(--bg-glass);
+                backdrop-filter: blur(12px);
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                border-radius: 14px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+                animation: slideInRight 0.4s ease forwards;
+            }
+
+            .alert-success {
+                border-left: 3px solid var(--success-green);
+                background: rgba(152, 151, 26, 0.05);
+            }
+            .alert-danger {
+                border-left: 3px solid var(--danger-red);
+                background: rgba(251, 73, 52, 0.05);
+            }
+            .alert-info {
+                border-left: 3px solid var(--primary-accent);
+                background: rgba(215, 153, 33, 0.05);
+            }
+            .alert-warning {
+                border-left: 3px solid var(--warning-amber);
+                background: rgba(250, 189, 47, 0.05);
+            }
+
+            .btn-close-white {
+                filter: invert(1) grayscale(100%) brightness(200%);
+            }
+
+            /* ===== MAIN ===== */
+            main {
+                flex: 1;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ===== FOOTER ===== */
+            .footer-premium {
+                position: relative;
+                z-index: 1;
+                background: rgba(40, 40, 40, 0.95);
+                border-top: 1px solid var(--border-color);
+                padding: 2.5rem 0;
+            }
+
+            .footer-premium::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 30%;
+                height: 1px;
+                background: var(--gradient-primary);
+                opacity: 0.3;
+            }
+
+            .footer-brand {
+                font-family: "Space Grotesk", sans-serif;
+                font-weight: 700;
+                font-size: 1rem;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: -0.02em;
+            }
+
+            .footer-dot {
+                width: 5px;
+                height: 5px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: inline-block;
+                margin: 0 0.5rem;
+                vertical-align: middle;
+            }
+
+            /* ===== UTILITY ===== */
+            .text-gradient {
+                background: var(--gradient-aurora);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .text-gradient-gold {
+                background: var(--gradient-gold);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .glass-card {
+                background: var(--bg-glass);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-color);
+                border-radius: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-premium">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <span class="brand-icon">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </span>
+                    Bargain Hunter
+                    <span class="nav-pill-badge">Premium</span>
+                </a>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-none d-md-flex align-items-center gap-2 me-2">
+                        <span
+                            class="status-dot"
+                            style="
+                                width: 8px;
+                                height: 8px;
+                                background: var(--success-green);
+                                border-radius: 50%;
+                                box-shadow: 0 0 8px rgba(152, 151, 26, 0.6);
+                                animation: pulseGreen 2s infinite;
+                                display: inline-block;
+                            "
+                        ></span>
+                        <span
+                            style="
+                                font-size: 0.78rem;
+                                color: var(--text-muted);
+                                letter-spacing: 0.02em;
+                            "
+                        >
+                            Engine Active
+                        </span>
+                    </div>
+
+                    <a
+                        href="{{ url_for('main.check_now') }}"
+                        class="btn btn-premium-outline btn-sync"
+                    >
+                        <span class="sync-icon"
+                            ><i class="bi bi-arrow-repeat"></i
+                        ></span>
+                        Sync Prices
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container mt-5 mb-5 animate-fade-in">
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %}
+            <div class="mb-5">
+                {% for category, msg in messages %} {% set alert_type = category
+                if category in ['success', 'danger', 'info', 'warning'] else
+                'info' %}
+                <div
+                    class="alert alert-{{ alert_type }} alert-premium alert-dismissible fade show d-flex align-items-center p-4 mb-3"
+                    role="alert"
+                >
+                    <div class="me-3 fs-4">
+                        {% if alert_type == 'success' %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        {% elif alert_type == 'danger' %}
+                        <i
+                            class="bi bi-exclamation-octagon-fill text-danger"
+                        ></i>
+                        {% elif alert_type == 'warning' %}
+                        <i
+                            class="bi bi-exclamation-triangle-fill text-warning"
+                        ></i>
+                        {% else %}
+                        <i
+                            class="bi bi-info-circle-fill"
+                            style="color: var(--primary-light)"
+                        ></i>
+                        {% endif %}
+                    </div>
+                    <div class="fw-medium text-white flex-grow-1">
+                        {{ msg }}
+                    </div>
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white ms-3"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %} {% endwith %} {% block content %}{% endblock %}
+        </main>
+
+        <footer class="footer-premium">
+            <div class="container">
+                <div
+                    class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3"
+                >
+                    <div class="d-flex align-items-center gap-2">
+                        <div
+                            style="
+                                width: 28px;
+                                height: 28px;
+                                background: var(--gradient-primary);
+                                border-radius: 8px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 0.8rem;
+                                color: white;
+                            "
+                        >
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <span class="footer-brand">Bargain Hunter</span>
+                    </div>
+
+                    <div
+                        class="d-flex align-items-center"
+                        style="font-size: 0.78rem; color: var(--text-muted)"
+                    >
+                        <span>Precision Price Tracking Engine</span>
+                        <span class="footer-dot"></span>
+                        <span>&copy; 2026</span>
+                        <span class="footer-dot"></span>
+                        <span style="color: var(--primary-light)"
+                            >v2.0 Premium</span
+                        >
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                font-size: 1rem;
+                                transition: color 0.2s;
+                            "
+                            onmouseover="
+                                this.style.color = 'var(--primary-light)'
+                            "
+                            onmouseout="this.style.color = 'var(--text-muted)'"
+                        >
+                            <i class="bi bi-github"></i>
+                        </a>
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                font-size: 1rem;
+                                transition: color 0.2s;
+                            "
+                            onmouseover="
+                                this.style.color = 'var(--primary-light)'
+                            "
+                            onmouseout="this.style.color = 'var(--text-muted)'"
+                        >
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                font-size: 1rem;
+                                transition: color 0.2s;
+                            "
+                            onmouseover="
+                                this.style.color = 'var(--primary-light)'
+                            "
+                            onmouseout="this.style.color = 'var(--text-muted)'"
+                        >
+                            <i class="bi bi-discord"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            // Auto-dismiss alerts after 5 seconds
+            document.querySelectorAll(".alert").forEach((alert) => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    if (alert.parentNode) bsAlert.close();
+                }, 5000);
+            });
+        </script>
+    </body>
+</html>
