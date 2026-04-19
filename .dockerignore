@@ -1,0 +1,15 @@
+# Environments
+venv/
+.env
+
+# Database
+products.db
+instance/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
