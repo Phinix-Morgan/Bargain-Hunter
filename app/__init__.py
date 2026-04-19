@@ -27,7 +27,15 @@ def create_app():
             "No SECRET_KEY set for Flask application. Check your .env file."
         )
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///products.db"
+    # --- UPDATED: Point database to the persistent instance folder ---
+    instance_path = os.path.join(project_root, "instance")
+    os.makedirs(
+        instance_path, exist_ok=True
+    )  # Safely create the folder if it's missing
+    db_path = os.path.join(instance_path, "products.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    # -----------------------------------------------------------------
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # Initialize database
