@@ -1,9 +1,9 @@
 {% extends "base.html" %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
     /* ===== DASHBOARD SPECIFIC ===== */
 
-    /* --- Header Section --- */
     .dashboard-hero {
         position: relative;
         margin-bottom: 2.5rem;
@@ -326,9 +326,6 @@
         opacity: 1;
     }
 
-    /* TASK 4: Card Color States */
-
-    /* State: Deal Hit */
     .product-card.is-deal {
         border-color: rgba(152, 151, 26, 0.3);
         background: linear-gradient(
@@ -354,7 +351,6 @@
             var(--glow-success);
     }
 
-    /* State: Pending */
     .product-card.is-pending {
         border-color: rgba(250, 189, 47, 0.3);
         background: linear-gradient(
@@ -380,7 +376,6 @@
             0 0 30px rgba(250, 189, 47, 0.1);
     }
 
-    /* State: Failed */
     .product-card.is-failed {
         border-color: rgba(251, 73, 52, 0.3);
         background: linear-gradient(
@@ -406,7 +401,6 @@
             0 0 30px rgba(251, 73, 52, 0.15);
     }
 
-    /* --- Card Number Badge --- */
     .card-index-badge {
         position: absolute;
         top: 1rem;
@@ -425,13 +419,11 @@
         font-family: "Space Grotesk", sans-serif;
     }
 
-    /* --- Card Body --- */
     .card-body-inner {
         padding: 1.5rem 1.5rem 1rem;
         flex: 1;
     }
 
-    /* --- Product Title Area --- */
     .product-title-area {
         margin-bottom: 1.25rem;
         padding-right: 2rem;
@@ -465,7 +457,6 @@
         overflow: hidden;
     }
 
-    /* --- Price Panel --- */
     .price-panel {
         background: rgba(29, 32, 33, 0.3);
         border: 1px solid rgba(255, 255, 255, 0.04);
@@ -521,7 +512,6 @@
         color: var(--text-soft);
     }
 
-    /* Savings Badge */
     .savings-badge {
         display: inline-flex;
         align-items: center;
@@ -536,7 +526,6 @@
         margin-top: 0.4rem;
     }
 
-    /* --- Progress Bar --- */
     .price-progress-wrap {
         margin-top: 1.1rem;
     }
@@ -590,7 +579,6 @@
         box-shadow: 0 0 10px rgba(152, 151, 26, 0.4);
     }
 
-    /* --- Deal Alert Banner --- */
     .deal-alert-banner {
         display: flex;
         align-items: center;
@@ -614,7 +602,6 @@
         animation: float 2s ease-in-out infinite;
     }
 
-    /* --- Product URL Chip --- */
     .product-url-area {
         padding: 0 1.5rem;
         margin-bottom: 1rem;
@@ -651,7 +638,6 @@
         flex-shrink: 0;
     }
 
-    /* --- Card Footer --- */
     .card-footer-bar {
         padding: 0.9rem 1.5rem;
         border-top: 1px solid rgba(255, 255, 255, 0.04);
@@ -702,7 +688,6 @@
         transform: scale(1.05);
     }
 
-    /* --- Fetching State --- */
     .fetching-badge {
         display: inline-flex;
         align-items: center;
@@ -725,7 +710,6 @@
         animation: pulseGreenDot 1s infinite;
     }
 
-    /* --- Failed State Badge --- */
     .failed-badge {
         display: inline-flex;
         align-items: center;
@@ -740,7 +724,6 @@
         letter-spacing: 0.05em;
     }
 
-    /* --- Empty State --- */
     .empty-state-wrapper {
         display: flex;
         flex-direction: column;
@@ -783,7 +766,6 @@
         margin-bottom: 2rem;
     }
 
-    /* --- Card Stagger Animations --- */
     .product-col:nth-child(1) .product-card {
         animation: fadeInUp 0.5s 0.05s ease both;
     }
@@ -805,7 +787,921 @@
     .product-col:nth-child(n + 7) .product-card {
         animation: fadeInUp 0.5s 0.35s ease both;
     }
+
+    /* ============================================================
+       PRICE HISTORY DASHBOARD
+    ============================================================ */
+
+    .ph-section {
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 1px solid var(--border-color);
+        position: relative;
+        animation: fadeInUp 0.6s 0.2s ease both;
+    }
+
+    .ph-section::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 0;
+        width: 80px;
+        height: 1px;
+        background: var(--gradient-primary);
+    }
+
+    .ph-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .ph-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        background: rgba(215, 153, 33, 0.07);
+        border: 1px solid rgba(215, 153, 33, 0.18);
+        color: var(--primary-light);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.8rem;
+        border-radius: 100px;
+        margin-bottom: 0.6rem;
+    }
+
+    .ph-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 1.45rem;
+        letter-spacing: -0.03em;
+        color: var(--text-main);
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .ph-subtitle {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    .ph-product-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+    }
+
+    .ph-select-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    .ph-select {
+        background: rgba(40, 40, 40, 0.8);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: var(--text-main);
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.5rem 2rem 0.5rem 0.85rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23928374' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.7rem center;
+        min-width: 180px;
+    }
+
+    .ph-select:focus {
+        outline: none;
+        border-color: rgba(215, 153, 33, 0.4);
+        box-shadow: 0 0 0 3px rgba(215, 153, 33, 0.1);
+    }
+
+    .ph-graph-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .ph-graph-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(215, 153, 33, 0.35),
+            transparent
+        );
+    }
+
+    .ph-graph-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.4rem 1.75rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .ph-graph-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .ph-graph-title-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        background: rgba(215, 153, 33, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: var(--primary-light);
+    }
+
+    .ph-time-filters {
+        display: flex;
+        gap: 0.35rem;
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.25rem;
+    }
+
+    .ph-time-btn {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: transparent;
+        border: none;
+        border-radius: 7px;
+        padding: 0.35rem 0.7rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .ph-time-btn:hover {
+        color: var(--primary-light);
+    }
+
+    .ph-time-btn.active {
+        background: rgba(215, 153, 33, 0.15);
+        color: var(--primary-light);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .ph-legend {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 1.75rem 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .ph-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+    }
+
+    .ph-legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .ph-legend-line {
+        width: 16px;
+        height: 2px;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    .ph-chart-wrap {
+        padding: 0 1.5rem 1.5rem;
+        position: relative;
+        min-height: 200px;
+    }
+
+    .ph-chart-wrap canvas {
+        max-height: 280px;
+        width: 100% !important;
+    }
+
+    .ph-chart-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3.5rem 2rem;
+        gap: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .ph-chart-loading .spinner-border {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-color: rgba(215, 153, 33, 0.3);
+        border-top-color: var(--primary-light);
+    }
+
+    .ph-chart-loading-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .ph-no-data {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3.5rem 2rem;
+        color: var(--text-muted);
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    .ph-no-data-icon {
+        font-size: 2rem;
+        opacity: 0.3;
+    }
+    .ph-no-data-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0.6;
+    }
+
+    .ph-data-meta {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 0 1.75rem 1rem;
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .ph-data-count-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(152, 151, 26, 0.08);
+        border: 1px solid rgba(152, 151, 26, 0.2);
+        color: var(--success-green);
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.2rem 0.55rem;
+        border-radius: 100px;
+        letter-spacing: 0.05em;
+    }
+
+    /* Insights Grid */
+    .ph-insights-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 992px) {
+        .ph-insights-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    .ph-insight-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.25rem 1.35rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .ph-insight-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(215, 153, 33, 0.25);
+    }
+
+    .ph-insight-card::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .ph-insight-card.ic-current {
+        border-top: 2px solid rgba(215, 153, 33, 0.4);
+    }
+    .ph-insight-card.ic-lowest {
+        border-top: 2px solid rgba(152, 151, 26, 0.5);
+    }
+    .ph-insight-card.ic-highest {
+        border-top: 2px solid rgba(251, 73, 52, 0.4);
+    }
+    .ph-insight-card.ic-average {
+        border-top: 2px solid rgba(131, 165, 152, 0.4);
+    }
+
+    .ph-insight-card.ic-current::after {
+        background: radial-gradient(
+            circle,
+            rgba(215, 153, 33, 0.08) 0%,
+            transparent 70%
+        );
+    }
+    .ph-insight-card.ic-lowest::after {
+        background: radial-gradient(
+            circle,
+            rgba(152, 151, 26, 0.1) 0%,
+            transparent 70%
+        );
+    }
+    .ph-insight-card.ic-highest::after {
+        background: radial-gradient(
+            circle,
+            rgba(251, 73, 52, 0.08) 0%,
+            transparent 70%
+        );
+    }
+    .ph-insight-card.ic-average::after {
+        background: radial-gradient(
+            circle,
+            rgba(131, 165, 152, 0.08) 0%,
+            transparent 70%
+        );
+    }
+
+    .ph-insight-icon-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.85rem;
+    }
+
+    .ph-insight-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+    }
+
+    .ic-current .ph-insight-icon {
+        background: rgba(215, 153, 33, 0.12);
+        color: var(--primary-light);
+    }
+    .ic-lowest .ph-insight-icon {
+        background: rgba(152, 151, 26, 0.12);
+        color: var(--success-green);
+    }
+    .ic-highest .ph-insight-icon {
+        background: rgba(251, 73, 52, 0.12);
+        color: var(--danger-red);
+    }
+    .ic-average .ph-insight-icon {
+        background: rgba(131, 165, 152, 0.12);
+        color: #83a598;
+    }
+
+    .ph-insight-badge {
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border-radius: 100px;
+        border: 1px solid;
+    }
+
+    .ic-current .ph-insight-badge {
+        color: var(--primary-light);
+        border-color: rgba(215, 153, 33, 0.25);
+        background: rgba(215, 153, 33, 0.07);
+    }
+    .ic-lowest .ph-insight-badge {
+        color: var(--success-green);
+        border-color: rgba(152, 151, 26, 0.25);
+        background: rgba(152, 151, 26, 0.07);
+    }
+    .ic-highest .ph-insight-badge {
+        color: var(--danger-red);
+        border-color: rgba(251, 73, 52, 0.25);
+        background: rgba(251, 73, 52, 0.07);
+    }
+    .ic-average .ph-insight-badge {
+        color: #83a598;
+        border-color: rgba(131, 165, 152, 0.25);
+        background: rgba(131, 165, 152, 0.07);
+    }
+
+    .ph-insight-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: var(--text-main);
+        margin-bottom: 0.25rem;
+        transition: all 0.4s ease;
+    }
+
+    .ic-lowest .ph-insight-value {
+        color: var(--success-green);
+    }
+    .ic-highest .ph-insight-value {
+        color: var(--danger-red);
+    }
+
+    .ph-insight-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+    }
+
+    .ph-insight-sub {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+        opacity: 0.7;
+        min-height: 1em;
+    }
+
+    /* Deal Card */
+    .ph-deal-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 1.5rem;
+        transition: all 0.35s ease;
+        height: 100%;
+    }
+
+    .ph-deal-card.deal-great {
+        border-color: rgba(152, 151, 26, 0.35);
+    }
+    .ph-deal-card.deal-average {
+        border-color: rgba(250, 189, 47, 0.35);
+    }
+    .ph-deal-card.deal-avoid {
+        border-color: rgba(251, 73, 52, 0.35);
+    }
+    .ph-deal-card.deal-neutral {
+        border-color: var(--border-color);
+    }
+
+    .ph-deal-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 1.75rem;
+        height: 100%;
+    }
+
+    /* ── Gemini badge header ── */
+    .ph-gemini-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+    }
+
+    .ph-gemini-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: linear-gradient(
+            135deg,
+            rgba(66, 133, 244, 0.12),
+            rgba(234, 67, 53, 0.08)
+        );
+        border: 1px solid rgba(66, 133, 244, 0.25);
+        border-radius: 100px;
+        padding: 0.28rem 0.75rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #8ab4f8;
+    }
+
+    .ph-gemini-badge-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #8ab4f8;
+        animation: pulseGreenDot 2s infinite;
+    }
+
+    .ph-confidence-chip {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 100px;
+        padding: 0.2rem 0.55rem;
+    }
+
+    /* Gauge */
+    .ph-score-gauge {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        flex-shrink: 0;
+        margin: 0 auto;
+    }
+
+    .ph-score-gauge svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+    .ph-gauge-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.05);
+        stroke-width: 8;
+    }
+
+    .ph-gauge-fill {
+        fill: none;
+        stroke-width: 8;
+        stroke-linecap: round;
+        transition:
+            stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+            stroke 0.4s ease;
+    }
+
+    .ph-score-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .ph-score-number {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.55rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1;
+    }
+
+    .ph-score-label {
+        font-size: 0.55rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-top: 0.15rem;
+    }
+
+    .ph-deal-verdict {
+        flex: 1;
+    }
+
+    .ph-verdict-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 0.5rem 1.1rem;
+        border-radius: 100px;
+        border: 1px solid;
+        margin-bottom: 0.7rem;
+    }
+
+    .vb-great {
+        color: var(--success-green);
+        border-color: rgba(152, 151, 26, 0.35);
+        background: rgba(152, 151, 26, 0.08);
+    }
+    .vb-average {
+        color: var(--warning-amber);
+        border-color: rgba(250, 189, 47, 0.35);
+        background: rgba(250, 189, 47, 0.08);
+    }
+    .vb-avoid {
+        color: var(--danger-red);
+        border-color: rgba(251, 73, 52, 0.35);
+        background: rgba(251, 73, 52, 0.08);
+    }
+    .vb-neutral {
+        color: var(--text-muted);
+        border-color: var(--border-color);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .ph-verdict-desc {
+        font-size: 0.83rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    /* Trend + Recommendation row */
+    .ph-trend-rec-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .ph-trend-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.35rem 0.85rem;
+        border-radius: 100px;
+        border: 1px solid;
+        letter-spacing: 0.04em;
+        width: fit-content;
+    }
+
+    .trend-falling {
+        color: var(--success-green);
+        border-color: rgba(152, 151, 26, 0.3);
+        background: rgba(152, 151, 26, 0.08);
+    }
+    .trend-rising {
+        color: var(--danger-red);
+        border-color: rgba(251, 73, 52, 0.3);
+        background: rgba(251, 73, 52, 0.08);
+    }
+    .trend-stable {
+        color: var(--warning-amber);
+        border-color: rgba(250, 189, 47, 0.3);
+        background: rgba(250, 189, 47, 0.08);
+    }
+    .trend-unknown {
+        color: var(--text-muted);
+        border-color: var(--border-color);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .ph-rec-box {
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        line-height: 1.4;
+    }
+
+    /* Score breakdown bars */
+    .ph-score-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .ph-sbar-header {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 0.2rem;
+    }
+
+    .ph-sbar-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .ph-sbar-left {
+        width: 70px;
+        flex-shrink: 0;
+    }
+
+    .ph-sbar-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        line-height: 1.2;
+    }
+
+    .ph-sbar-sublabel {
+        font-size: 0.58rem;
+        color: var(--text-muted);
+        opacity: 0.55;
+        font-weight: 500;
+        line-height: 1.2;
+        margin-top: 0.1rem;
+    }
+
+    .ph-sbar-track {
+        flex: 1;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .ph-sbar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ph-sbar-val {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-soft);
+        width: 28px;
+        text-align: right;
+        font-family: "Space Grotesk", sans-serif;
+    }
+
+    /* Loading shimmer inside deal card */
+    .ph-gemini-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.85rem;
+        padding: 2rem 1rem;
+        text-align: center;
+    }
+
+    .ph-gemini-loading-spinner {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 3px solid rgba(66, 133, 244, 0.15);
+        border-top-color: #8ab4f8;
+        animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .ph-gemini-loading-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .ph-gemini-loading-sub {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        opacity: 0.5;
+        max-width: 180px;
+        line-height: 1.5;
+    }
+
+    /* Pulse animation for loading dots */
+    .ph-loading-dots span {
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #8ab4f8;
+        margin: 0 2px;
+        animation: loadingDot 1.4s ease-in-out infinite;
+    }
+    .ph-loading-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    .ph-loading-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes loadingDot {
+        0%,
+        80%,
+        100% {
+            opacity: 0.2;
+            transform: scale(0.8);
+        }
+        40% {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    /* Empty / error states */
+    .ph-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1.5rem;
+        text-align: center;
+        gap: 0.75rem;
+        color: var(--text-muted);
+        width: 100%;
+    }
+
+    .ph-empty-icon {
+        font-size: 2.2rem;
+        opacity: 0.25;
+        margin-bottom: 0.25rem;
+    }
+    .ph-empty-msg {
+        font-size: 0.85rem;
+        opacity: 0.55;
+        font-weight: 500;
+    }
+
+    .ph-insufficient-notice {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: rgba(250, 189, 47, 0.06);
+        border: 1px solid rgba(250, 189, 47, 0.2);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.78rem;
+        color: var(--warning-amber);
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    /* Gemini error notice */
+    .ph-gemini-error {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        background: rgba(251, 73, 52, 0.06);
+        border: 1px solid rgba(251, 73, 52, 0.2);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.75rem;
+        color: var(--danger-red);
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
 </style>
+
+<!-- ===================== DASHBOARD HTML ===================== -->
 
 <div class="dashboard-hero animate-fade-in">
     <div
@@ -834,11 +1730,6 @@
         </div>
 
         <div class="stats-strip">
-            {% set deal_count = products | selectattr('current_price', '!=',
-            none) | selectattr('current_price', 'le', products |
-            map(attribute='target_price') | list | first | default(0)) | list |
-            length %}
-
             <div class="stat-chip">
                 <div
                     class="stat-chip-icon"
@@ -928,7 +1819,6 @@
                         />
                     </div>
                 </div>
-
                 <div class="col-lg-3">
                     <div class="add-input-group">
                         <span class="currency-symbol">₹</span>
@@ -944,7 +1834,6 @@
                         />
                     </div>
                 </div>
-
                 <div class="col-lg-2">
                     <button
                         type="submit"
@@ -994,15 +1883,21 @@
     p.current_price %} {% endif %}
 
     <div class="col-md-6 col-xl-4 product-col">
-        <div class="product-card {{ state_class }}">
+        <div
+            class="product-card {{ state_class }}"
+            data-product-id="{{ p.id }}"
+            data-product-name="{{ p.product_name }}"
+            data-current-price="{{ p.current_price if p.current_price is not none else '' }}"
+            data-target-price="{{ p.target_price }}"
+        >
             <div class="card-index-badge">{{ loop.index }}</div>
 
             <div class="card-body-inner">
                 <div class="product-title-area">
                     <div class="retailer-badge">
                         <i class="bi bi-shop" style="font-size: 0.75rem"></i>
-                        {% if 'amazon' in p.url %}Amazon{% elif 'flipkart' in
-                        p.url %}Flipkart{% elif 'myntra' in p.url %}Myntra{%
+                        {% if 'amazon' in p.url %}Amazon {% elif 'flipkart' in
+                        p.url %}Flipkart {% elif 'myntra' in p.url %}Myntra {%
                         else %}Retailer{% endif %}
                     </div>
                     <h5 class="card-product-title" title="{{ p.product_name }}">
@@ -1047,8 +1942,7 @@
                             {% endif %} {% elif "Failed to load" in
                             p.product_name %}
                             <div class="failed-badge mt-1">
-                                <i class="bi bi-x-circle me-1"></i>
-                                Failed
+                                <i class="bi bi-x-circle me-1"></i>Failed
                             </div>
                             {% else %}
                             <div class="fetching-badge mt-1">
@@ -1057,7 +1951,6 @@
                             </div>
                             {% endif %}
                         </div>
-
                         <div class="text-end">
                             <div class="price-label">Alert Price</div>
                             <div class="price-target-display">
@@ -1128,7 +2021,6 @@
                     ></i>
                     Pending sync {% endif %}
                 </div>
-
                 <a
                     href="{{ url_for('main.delete', id=p.id) }}"
                     onclick="return confirm('Stop tracking this item?');"
@@ -1142,7 +2034,6 @@
     </div>
 
     {% else %}
-
     <div class="col-12">
         <div class="empty-state-wrapper">
             <div class="empty-icon-ring">
@@ -1178,23 +2069,426 @@
             </div>
         </div>
     </div>
-
     {% endfor %}
 </div>
 
+<!-- ============================================================
+     PRICE HISTORY DASHBOARD SECTION
+============================================================ -->
+{% if products %}
+<section class="ph-section" id="priceHistoryDashboard">
+    <div class="ph-header">
+        <div>
+            <div class="ph-eyebrow">
+                <i class="bi bi-graph-up-arrow" style="font-size: 0.75rem"></i>
+                Price Intelligence
+            </div>
+            <h2 class="ph-title">
+                Price History <span class="text-gradient">Dashboard</span>
+            </h2>
+            <p class="ph-subtitle">
+                Real scraped records · AI deal analysis powered by Gemini
+            </p>
+        </div>
+
+        <div class="ph-product-selector">
+            <span class="ph-select-label">Analyse</span>
+            <select class="ph-select" id="phProductSelect">
+                <option value="">— Choose a product —</option>
+                {% for p in products %} {% if p.current_price is not none %}
+                <option
+                    value="{{ p.id }}"
+                    data-name="{{ p.product_name | truncate(45) }}"
+                    data-current="{{ p.current_price }}"
+                    data-target="{{ p.target_price }}"
+                >
+                    {{ p.product_name | truncate(40) }}
+                </option>
+                {% endif %} {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Insights Grid -->
+    <div class="ph-insights-grid">
+        <div class="ph-insight-card ic-current">
+            <div class="ph-insight-icon-row">
+                <div class="ph-insight-icon">
+                    <i class="bi bi-currency-rupee"></i>
+                </div>
+                <span class="ph-insight-badge">Live</span>
+            </div>
+            <div class="ph-insight-value" id="insightCurrent">—</div>
+            <div class="ph-insight-label">Current Price</div>
+            <div class="ph-insight-sub" id="insightCurrentSub">
+                Select a product
+            </div>
+        </div>
+
+        <div class="ph-insight-card ic-lowest">
+            <div class="ph-insight-icon-row">
+                <div class="ph-insight-icon">
+                    <i class="bi bi-arrow-down-circle-fill"></i>
+                </div>
+                <span class="ph-insight-badge">Best</span>
+            </div>
+            <div class="ph-insight-value" id="insightLowest">—</div>
+            <div class="ph-insight-label">Lowest Ever</div>
+            <div class="ph-insight-sub" id="insightLowestSub">
+                Historical low
+            </div>
+        </div>
+
+        <div class="ph-insight-card ic-highest">
+            <div class="ph-insight-icon-row">
+                <div class="ph-insight-icon">
+                    <i class="bi bi-arrow-up-circle-fill"></i>
+                </div>
+                <span class="ph-insight-badge">Peak</span>
+            </div>
+            <div class="ph-insight-value" id="insightHighest">—</div>
+            <div class="ph-insight-label">Highest Price</div>
+            <div class="ph-insight-sub" id="insightHighestSub">
+                Historical peak
+            </div>
+        </div>
+
+        <div class="ph-insight-card ic-average">
+            <div class="ph-insight-icon-row">
+                <div class="ph-insight-icon">
+                    <i class="bi bi-bar-chart-line-fill"></i>
+                </div>
+                <span class="ph-insight-badge">Avg</span>
+            </div>
+            <div class="ph-insight-value" id="insightAverage">—</div>
+            <div class="ph-insight-label">Average Price</div>
+            <div class="ph-insight-sub" id="insightAverageSub">
+                Across all records
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Graph Card -->
+        <div class="col-lg-8">
+            <div class="ph-graph-card">
+                <div class="ph-graph-header">
+                    <div class="ph-graph-title">
+                        <div class="ph-graph-title-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        Price Trend
+                        <span
+                            id="phGraphProductName"
+                            style="
+                                font-size: 0.78rem;
+                                font-weight: 500;
+                                color: var(--text-muted);
+                                margin-left: 0.3rem;
+                            "
+                        ></span>
+                    </div>
+                    <div class="ph-time-filters">
+                        <button class="ph-time-btn active" data-range="7">
+                            7D
+                        </button>
+                        <button class="ph-time-btn" data-range="30">30D</button>
+                        <button class="ph-time-btn" data-range="90">90D</button>
+                        <button class="ph-time-btn" data-range="365">1Y</button>
+                    </div>
+                </div>
+
+                <div class="ph-legend">
+                    <div class="ph-legend-item">
+                        <div
+                            class="ph-legend-line"
+                            style="background: #d79921"
+                        ></div>
+                        Price
+                    </div>
+                    <div class="ph-legend-item">
+                        <div
+                            class="ph-legend-line"
+                            style="background: rgba(177, 98, 134, 0.7)"
+                        ></div>
+                        Target
+                    </div>
+                    <div class="ph-legend-item">
+                        <div
+                            class="ph-legend-dot"
+                            style="background: #98971a"
+                        ></div>
+                        Lowest
+                    </div>
+                    <div class="ph-legend-item">
+                        <div
+                            class="ph-legend-dot"
+                            style="background: #fb4934"
+                        ></div>
+                        Highest
+                    </div>
+                </div>
+
+                <div class="ph-chart-wrap" id="phChartWrap">
+                    <div class="ph-no-data" id="phChartEmpty">
+                        <div class="ph-no-data-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div class="ph-no-data-text">
+                            Select a product to load its real price trend
+                        </div>
+                    </div>
+
+                    <div
+                        class="ph-chart-loading"
+                        id="phChartLoading"
+                        style="display: none"
+                    >
+                        <div class="spinner-border" role="status"></div>
+                        <div class="ph-chart-loading-text">
+                            Fetching price records…
+                        </div>
+                    </div>
+
+                    <div
+                        id="phNotEnoughData"
+                        style="display: none; padding: 0 0 1rem"
+                    >
+                        <div class="ph-insufficient-notice">
+                            <i class="bi bi-info-circle-fill"></i>
+                            Only <strong id="phDataCountMsg">1</strong> price
+                            record found. More data builds up automatically with
+                            each 30-min scrape cycle.
+                        </div>
+                    </div>
+
+                    <canvas
+                        id="phPriceTrendChart"
+                        style="display: none"
+                    ></canvas>
+                </div>
+
+                <div class="ph-data-meta" id="phDataMeta" style="display: none">
+                    <div class="ph-data-count-badge">
+                        <i class="bi bi-database-fill"></i>
+                        <span id="phDataCountBadge">0</span> real records
+                    </div>
+                    <span>from your database</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── GEMINI DEAL ANALYSIS CARD ──────────────────────── -->
+        <div class="col-lg-4">
+            <div class="ph-deal-card deal-neutral" id="phDealCard">
+                <div class="ph-deal-inner">
+                    <!-- Empty prompt -->
+                    <div class="ph-empty-state" id="phDealEmpty">
+                        <div class="ph-empty-icon">
+                            <i class="bi bi-stars"></i>
+                        </div>
+                        <div class="ph-empty-msg">
+                            Select a product for Gemini AI deal analysis
+                        </div>
+                    </div>
+
+                    <!-- Gemini loading state -->
+                    <div
+                        id="phGeminiLoading"
+                        style="display: none; width: 100%"
+                    >
+                        <div class="ph-gemini-loading">
+                            <div class="ph-gemini-loading-spinner"></div>
+                            <div class="ph-gemini-loading-text">
+                                Gemini is analysing…
+                                <div class="ph-loading-dots mt-1">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                            <div class="ph-gemini-loading-sub">
+                                Reading price history &amp; computing deal
+                                intelligence
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gemini analysis content -->
+                    <div id="phDealContent" style="display: none; width: 100%">
+                        <!-- Gemini badge + confidence -->
+                        <div class="ph-gemini-header">
+                            <div class="ph-gemini-badge">
+                                <span class="ph-gemini-badge-dot"></span>
+                                Gemini AI
+                            </div>
+                            <span class="ph-confidence-chip">
+                                Confidence: <span id="phConfidence">—</span>%
+                            </span>
+                        </div>
+
+                        <!-- Gauge + Verdict -->
+                        <div
+                            class="d-flex align-items-center gap-3 flex-wrap mb-1 mt-2"
+                        >
+                            <div class="ph-score-gauge">
+                                <svg viewBox="0 0 100 100">
+                                    <circle
+                                        class="ph-gauge-bg"
+                                        cx="50"
+                                        cy="50"
+                                        r="38"
+                                    />
+                                    <circle
+                                        class="ph-gauge-fill"
+                                        id="phGaugeFill"
+                                        cx="50"
+                                        cy="50"
+                                        r="38"
+                                        stroke-dasharray="238.76"
+                                        stroke-dashoffset="238.76"
+                                    />
+                                </svg>
+                                <div class="ph-score-center">
+                                    <div
+                                        class="ph-score-number"
+                                        id="phScoreNum"
+                                    >
+                                        0
+                                    </div>
+                                    <div class="ph-score-label">Score</div>
+                                </div>
+                            </div>
+
+                            <div class="ph-deal-verdict">
+                                <div
+                                    class="ph-verdict-badge vb-neutral"
+                                    id="phVerdictBadge"
+                                >
+                                    —
+                                </div>
+                                <div class="ph-verdict-desc" id="phVerdictDesc">
+                                    Loading deal intelligence…
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trend + Recommendation -->
+                        <div class="ph-trend-rec-row mt-2">
+                            <div
+                                class="ph-trend-chip trend-unknown"
+                                id="phTrendChip"
+                            >
+                                <i class="bi bi-dash" id="phTrendIcon"></i>
+                                <span id="phTrendText">Trend unknown</span>
+                            </div>
+                            <div class="ph-rec-box">
+                                <i
+                                    class="bi bi-robot"
+                                    style="
+                                        color: #8ab4f8;
+                                        flex-shrink: 0;
+                                        font-size: 0.9rem;
+                                    "
+                                ></i>
+                                <span id="phRecommendation"
+                                    >Awaiting analysis…</span
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Score breakdown bars (Gemini-powered) -->
+                        <div class="ph-score-bars mt-3">
+                            <div class="ph-sbar-header">
+                                Score Breakdown · By Gemini
+                            </div>
+
+                            <div class="ph-sbar-row">
+                                <div class="ph-sbar-left">
+                                    <div class="ph-sbar-label">vs Target</div>
+                                    <div
+                                        class="ph-sbar-sublabel"
+                                        id="sbarTargetLabel"
+                                    >
+                                        —
+                                    </div>
+                                </div>
+                                <div class="ph-sbar-track">
+                                    <div
+                                        class="ph-sbar-fill"
+                                        id="sbarTarget"
+                                        style="width: 0%; background: #d79921"
+                                    ></div>
+                                </div>
+                                <span class="ph-sbar-val" id="sbarTargetVal"
+                                    >0%</span
+                                >
+                            </div>
+
+                            <div class="ph-sbar-row">
+                                <div class="ph-sbar-left">
+                                    <div class="ph-sbar-label">vs Lowest</div>
+                                    <div
+                                        class="ph-sbar-sublabel"
+                                        id="sbarLowestLabel"
+                                    >
+                                        —
+                                    </div>
+                                </div>
+                                <div class="ph-sbar-track">
+                                    <div
+                                        class="ph-sbar-fill"
+                                        id="sbarLowest"
+                                        style="width: 0%; background: #98971a"
+                                    ></div>
+                                </div>
+                                <span class="ph-sbar-val" id="sbarLowestVal"
+                                    >0%</span
+                                >
+                            </div>
+
+                            <div class="ph-sbar-row">
+                                <div class="ph-sbar-left">
+                                    <div class="ph-sbar-label">vs Average</div>
+                                    <div
+                                        class="ph-sbar-sublabel"
+                                        id="sbarAverageLabel"
+                                    >
+                                        —
+                                    </div>
+                                </div>
+                                <div class="ph-sbar-track">
+                                    <div
+                                        class="ph-sbar-fill"
+                                        id="sbarAverage"
+                                        style="width: 0%; background: #83a598"
+                                    ></div>
+                                </div>
+                                <span class="ph-sbar-val" id="sbarAverageVal"
+                                    >0%</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /#phDealContent -->
+                </div>
+            </div>
+        </div>
+        <!-- ── END GEMINI DEAL ANALYSIS CARD ──────────────────── -->
+    </div>
+    <!-- /.row -->
+</section>
+{% endif %}
+
+<!-- ===================== SCRIPTS ===================== -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // --- TASK 3: LOADING ANIMATION ---
+        /* ── Track form loading animation ───────────────────────── */
         const trackForm = document.getElementById("trackForm");
-
         if (trackForm) {
             trackForm.addEventListener("submit", function () {
                 const btn = document.getElementById("trackBtn");
-
                 btn.disabled = true;
                 btn.style.opacity = "0.9";
                 btn.style.cursor = "not-allowed";
-
                 const loadingStates = [
                     "Initializing Engine...",
                     "Bypassing Security...",
@@ -1202,64 +2496,606 @@
                     "AI Parsing Data...",
                     "Finalizing...",
                 ];
-
-                let currentStep = 0;
-
+                let step = 0;
                 btn.innerHTML = `
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" style="color: var(--text-main);"></span>
-                <span id="dynamicLoadText" style="font-size: 0.85rem; color: var(--text-main);">${loadingStates[0]}</span>
-            `;
-
+                <span class="spinner-border spinner-border-sm me-2" role="status"
+                      aria-hidden="true" style="color:var(--text-main);"></span>
+                <span id="dynamicLoadText" style="font-size:0.85rem; color:var(--text-main);">
+                    ${loadingStates[0]}
+                </span>`;
                 setInterval(() => {
-                    currentStep++;
-                    if (currentStep < loadingStates.length) {
-                        const textEl =
-                            document.getElementById("dynamicLoadText");
-                        if (textEl)
-                            textEl.innerText = loadingStates[currentStep];
+                    step++;
+                    if (step < loadingStates.length) {
+                        const el = document.getElementById("dynamicLoadText");
+                        if (el) el.innerText = loadingStates[step];
                     }
                 }, 3000);
             });
         }
 
-        // --- TASK 5: FILTERS & SORTING ENGINE ---
+        /* ── Sort chips ──────────────────────────────────────────── */
         const filterChips = document.querySelectorAll(".sort-chip");
         const productCols = document.querySelectorAll(".product-col");
 
         if (filterChips.length > 0 && productCols.length > 0) {
             filterChips.forEach((chip) => {
                 chip.addEventListener("click", function () {
-                    // 1. Visually update active chip state
                     filterChips.forEach((c) => c.classList.remove("active"));
                     this.classList.add("active");
-
-                    // 2. Identify which filter was clicked
                     const filterType = this.innerText.trim().toLowerCase();
-
-                    // 3. Loop through grid and apply logic
                     productCols.forEach((col, index) => {
-                        // Reset to default standard state before applying new filter
                         col.style.display = "";
                         col.style.order = "0";
-
                         if (filterType === "deals") {
-                            // Hide columns that do not contain a card with the 'is-deal' class
                             const isDeal = col
                                 .querySelector(".product-card")
                                 .classList.contains("is-deal");
-                            if (!isDeal) {
-                                col.style.display = "none";
-                            }
+                            if (!isDeal) col.style.display = "none";
                         } else if (filterType === "recent") {
-                            // Reverse the CSS Flexbox order so newest items appear at the top
                             col.style.order = productCols.length - index;
                         }
-                        // If 'all', do nothing because we already reset defaults above
                     });
                 });
             });
         }
-    });
+
+        /* ══════════════════════════════════════════════════════════
+       PRICE HISTORY + GEMINI DEAL ANALYSIS ENGINE
+    ══════════════════════════════════════════════════════════ */
+
+        let phChart = null;
+        let currentDays = 7;
+        let activeProductId = null;
+
+        // DOM refs — chart area
+        const canvas = document.getElementById("phPriceTrendChart");
+        const chartEmpty = document.getElementById("phChartEmpty");
+        const chartLoading = document.getElementById("phChartLoading");
+        const notEnoughData = document.getElementById("phNotEnoughData");
+        const dataMeta = document.getElementById("phDataMeta");
+
+        // DOM refs — deal card
+        const dealCard = document.getElementById("phDealCard");
+        const dealEmpty = document.getElementById("phDealEmpty");
+        const geminiLoading = document.getElementById("phGeminiLoading");
+        const dealContent = document.getElementById("phDealContent");
+
+        /* ── Formatters ──────────────────────────────────────────── */
+        const fmtRupee = (v) =>
+            v == null
+                ? "—"
+                : "₹" +
+                  Number(v).toLocaleString("en-IN", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                  });
+
+        /* ── Chart state switcher ────────────────────────────────── */
+        function showChartState(state) {
+            chartEmpty.style.display = state === "empty" ? "flex" : "none";
+            chartLoading.style.display = state === "loading" ? "flex" : "none";
+            canvas.style.display =
+                state === "chart" || state === "insufficient"
+                    ? "block"
+                    : "none";
+            notEnoughData.style.display =
+                state === "insufficient" ? "block" : "none";
+            dataMeta.style.display =
+                state === "chart" || state === "insufficient" ? "flex" : "none";
+        }
+
+        /* ── Deal card state switcher ────────────────────────────── */
+        function showDealState(state) {
+            // state: 'empty' | 'loading' | 'content'
+            dealEmpty.style.display = state === "empty" ? "flex" : "none";
+            geminiLoading.style.display =
+                state === "loading" ? "block" : "none";
+            dealContent.style.display = state === "content" ? "block" : "none";
+        }
+
+        /* ── Reset helpers ───────────────────────────────────────── */
+        function resetInsights() {
+            [
+                "insightCurrent",
+                "insightLowest",
+                "insightHighest",
+                "insightAverage",
+            ].forEach((id) => {
+                document.getElementById(id).textContent = "—";
+            });
+            document.getElementById("insightCurrentSub").textContent =
+                "Select a product";
+            document.getElementById("insightLowestSub").textContent =
+                "Historical low";
+            document.getElementById("insightHighestSub").textContent =
+                "Historical peak";
+            document.getElementById("insightAverageSub").textContent =
+                "Across all records";
+        }
+
+        function resetDealCard() {
+            dealCard.className = "ph-deal-card deal-neutral";
+            showDealState("empty");
+        }
+
+        /* ── Fetch price history from Flask API ──────────────────── */
+        async function fetchHistory(productId, days) {
+            const res = await fetch(
+                `/api/price-history/${productId}?days=${days}`,
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        /* ── Call Gemini analysis API ────────────────────────────── */
+        async function fetchGeminiAnalysis(data, productName) {
+            const res = await fetch("/api/gemini-deal-analysis", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    product_name: productName,
+                    current: data.current,
+                    target: data.target,
+                    lowest: data.lowest,
+                    highest: data.highest,
+                    average: data.average,
+                    count: data.count,
+                    prices: data.prices,
+                }),
+            });
+            if (!res.ok) throw new Error(`Gemini API HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        /* ── Build Chart.js graph ────────────────────────────────── */
+        function buildChart(data) {
+            if (phChart) {
+                phChart.destroy();
+                phChart = null;
+            }
+
+            const { prices, labels, target, lowest, highest } = data;
+            const loIdx = prices.indexOf(lowest);
+            const hiIdx = prices.indexOf(highest);
+            const ctx = canvas.getContext("2d");
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+            gradient.addColorStop(0, "rgba(215,153,33,0.22)");
+            gradient.addColorStop(0.6, "rgba(215,153,33,0.04)");
+            gradient.addColorStop(1, "rgba(215,153,33,0)");
+
+            phChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: "Price (₹)",
+                            data: prices,
+                            borderColor: "#d79921",
+                            borderWidth: 2.5,
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: gradient,
+                            pointRadius: prices.map((_, i) =>
+                                i === loIdx || i === hiIdx
+                                    ? 7
+                                    : prices.length <= 5
+                                      ? 4
+                                      : 0,
+                            ),
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: prices.map((_, i) => {
+                                if (i === loIdx) return "#98971a";
+                                if (i === hiIdx) return "#fb4934";
+                                return "#d79921";
+                            }),
+                            pointBorderColor: prices.map((_, i) => {
+                                if (i === loIdx) return "#98971a";
+                                if (i === hiIdx) return "#fb4934";
+                                return "#d79921";
+                            }),
+                            pointBorderWidth: 2,
+                        },
+                        {
+                            label: "Target (₹)",
+                            data: labels.map(() => target),
+                            borderColor: "rgba(177,98,134,0.65)",
+                            borderWidth: 1.5,
+                            borderDash: [6, 4],
+                            pointRadius: 0,
+                            pointHoverRadius: 0,
+                            tension: 0,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: "index", intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: "rgba(29,32,33,0.95)",
+                            borderColor: "rgba(215,153,33,0.25)",
+                            borderWidth: 1,
+                            titleColor: "#ebdbb2",
+                            bodyColor: "#928374",
+                            padding: 12,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: (ctx) => {
+                                    const val = ctx.parsed.y;
+                                    return `  ${ctx.dataset.label}: ₹${val.toLocaleString("en-IN")}`;
+                                },
+                                afterBody: (items) => {
+                                    const pi = items.find(
+                                        (i) => i.datasetIndex === 0,
+                                    );
+                                    if (!pi) return "";
+                                    const diff = target - pi.parsed.y;
+                                    if (diff > 0)
+                                        return [
+                                            `  ✓ ₹${Math.abs(diff).toFixed(0)} below target`,
+                                        ];
+                                    if (diff < 0)
+                                        return [
+                                            `  ↑ ₹${Math.abs(diff).toFixed(0)} above target`,
+                                        ];
+                                    return ["  = At target"];
+                                },
+                            },
+                        },
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: "rgba(255,255,255,0.03)",
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: "#665c54",
+                                font: { size: 10, weight: "600" },
+                                maxTicksLimit: 8,
+                            },
+                            border: { display: false },
+                        },
+                        y: {
+                            position: "right",
+                            grid: {
+                                color: "rgba(255,255,255,0.04)",
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: "#665c54",
+                                font: { size: 10, weight: "600" },
+                                callback: (v) =>
+                                    "₹" + v.toLocaleString("en-IN"),
+                                maxTicksLimit: 5,
+                            },
+                            border: { display: false },
+                        },
+                    },
+                    animation: { duration: 800, easing: "easeInOutQuart" },
+                },
+            });
+        }
+
+        /* ── Update Insights Panel ───────────────────────────────── */
+        function updateInsights(data) {
+            const {
+                current: cur,
+                lowest: lo,
+                highest: hi,
+                average: avg,
+                count,
+            } = data;
+
+            document.getElementById("insightCurrent").textContent =
+                fmtRupee(cur);
+            document.getElementById("insightCurrentSub").textContent =
+                count === 1
+                    ? "First record — more coming each scrape"
+                    : "Latest scraped price";
+
+            document.getElementById("insightLowest").textContent = fmtRupee(lo);
+            document.getElementById("insightLowestSub").textContent =
+                cur === lo
+                    ? "🎉 You're at the lowest!"
+                    : `Current is ₹${(cur - lo).toFixed(0)} above low`;
+
+            document.getElementById("insightHighest").textContent =
+                fmtRupee(hi);
+            document.getElementById("insightHighestSub").textContent =
+                hi > 0
+                    ? `${(((hi - cur) / hi) * 100).toFixed(0)}% below peak`
+                    : "—";
+
+            document.getElementById("insightAverage").textContent =
+                fmtRupee(avg);
+            document.getElementById("insightAverageSub").textContent =
+                cur < avg
+                    ? `₹${(avg - cur).toFixed(0)} below avg — good`
+                    : `₹${(cur - avg).toFixed(0)} above avg`;
+        }
+
+        /* ── Render Gemini analysis into the deal card ───────────── */
+        function renderGeminiAnalysis(analysis) {
+            const score = analysis.score;
+            const verdict = analysis.verdict;
+            const emoji = analysis.verdict_emoji || "";
+            const desc = analysis.description;
+            const trend = analysis.trend || "unknown";
+            const rec = analysis.recommendation || "";
+            const conf = analysis.confidence ?? "—";
+            const breakdown = analysis.breakdown || {};
+
+            // Card border state
+            const stateMap = {
+                "Great Deal": "deal-great",
+                "Average Deal": "deal-average",
+                Overpriced: "deal-avoid",
+                Neutral: "deal-neutral",
+            };
+            dealCard.className = `ph-deal-card ${stateMap[verdict] || "deal-neutral"}`;
+
+            // Confidence
+            document.getElementById("phConfidence").textContent = conf;
+
+            // Score gauge
+            const circumference = 238.76;
+            const offset = circumference - (score / 100) * circumference;
+            const gaugeColorMap = {
+                "Great Deal": "#98971a",
+                "Average Deal": "#fabd2f",
+                Overpriced: "#fb4934",
+                Neutral: "#928374",
+            };
+            const gaugeColor = gaugeColorMap[verdict] || "#928374";
+
+            document.getElementById("phScoreNum").textContent = score;
+            document.getElementById("phScoreNum").style.color = gaugeColor;
+            const gaugeFill = document.getElementById("phGaugeFill");
+            gaugeFill.style.stroke = gaugeColor;
+            gaugeFill.style.strokeDashoffset = offset;
+            gaugeFill.style.filter = `drop-shadow(0 0 6px ${gaugeColor}55)`;
+
+            // Verdict badge
+            const vbClassMap = {
+                "Great Deal": "vb-great",
+                "Average Deal": "vb-average",
+                Overpriced: "vb-avoid",
+                Neutral: "vb-neutral",
+            };
+            const badge = document.getElementById("phVerdictBadge");
+            badge.className = `ph-verdict-badge ${vbClassMap[verdict] || "vb-neutral"}`;
+            badge.innerHTML = `${emoji} ${verdict}`;
+
+            // Description
+            document.getElementById("phVerdictDesc").textContent = desc;
+
+            // Trend chip
+            const trendChip = document.getElementById("phTrendChip");
+            const trendIcon = document.getElementById("phTrendIcon");
+            const trendText = document.getElementById("phTrendText");
+            const trendMap = {
+                falling: {
+                    cls: "trend-falling",
+                    icon: "bi-arrow-down-right",
+                    label: "Price Falling ↓",
+                },
+                rising: {
+                    cls: "trend-rising",
+                    icon: "bi-arrow-up-right",
+                    label: "Price Rising ↑",
+                },
+                stable: {
+                    cls: "trend-stable",
+                    icon: "bi-dash-lg",
+                    label: "Price Stable →",
+                },
+                unknown: {
+                    cls: "trend-unknown",
+                    icon: "bi-question-lg",
+                    label: "Trend Unknown",
+                },
+            };
+            const t = trendMap[trend] || trendMap.unknown;
+            trendChip.className = `ph-trend-chip ${t.cls}`;
+            trendIcon.className = `bi ${t.icon}`;
+            trendText.textContent = t.label;
+
+            // Recommendation
+            document.getElementById("phRecommendation").textContent = rec;
+
+            // Score breakdown bars
+            const vsTarget = breakdown.vs_target || {};
+            const vsLowest = breakdown.vs_lowest || {};
+            const vsAverage = breakdown.vs_average || {};
+
+            function setBar(fillId, valId, labelId, data, defaultColor) {
+                const s = Math.max(0, Math.min(100, data.score || 0));
+                document.getElementById(fillId).style.width = s + "%";
+                document.getElementById(fillId).style.background =
+                    data.color || defaultColor;
+                document.getElementById(valId).textContent = s + "%";
+                if (labelId) {
+                    document.getElementById(labelId).textContent =
+                        data.label || "—";
+                }
+            }
+
+            setBar(
+                "sbarTarget",
+                "sbarTargetVal",
+                "sbarTargetLabel",
+                vsTarget,
+                "#d79921",
+            );
+            setBar(
+                "sbarLowest",
+                "sbarLowestVal",
+                "sbarLowestLabel",
+                vsLowest,
+                "#98971a",
+            );
+            setBar(
+                "sbarAverage",
+                "sbarAverageVal",
+                "sbarAverageLabel",
+                vsAverage,
+                "#83a598",
+            );
+
+            showDealState("content");
+        }
+
+        /* ── Main orchestrator ───────────────────────────────────── */
+        async function updateDashboard(productId, days) {
+            activeProductId = productId;
+
+            // 1. Show loading states
+            showChartState("loading");
+            showDealState("loading");
+            dealCard.className = "ph-deal-card deal-neutral";
+
+            // Get product name from select
+            const sel = document.getElementById("phProductSelect");
+            const opt = sel.options[sel.selectedIndex];
+            const productName = opt
+                ? opt.dataset.name || opt.text
+                : "Unknown Product";
+
+            try {
+                // 2. Fetch price history
+                const data = await fetchHistory(productId, days);
+
+                if (!data.has_data) {
+                    showChartState("empty");
+                    chartEmpty.querySelector(".ph-no-data-text").textContent =
+                        "No price records found yet. Check back after the next scrape cycle.";
+                    resetInsights();
+                    resetDealCard();
+                    return;
+                }
+
+                // Update graph header product name
+                document.getElementById("phGraphProductName").textContent =
+                    "— " + productName.slice(0, 35);
+
+                // Update data badge
+                document.getElementById("phDataCountBadge").textContent =
+                    data.count;
+
+                // Show chart
+                if (data.count < 2) {
+                    showChartState("insufficient");
+                    document.getElementById("phDataCountMsg").textContent =
+                        data.count;
+                } else {
+                    showChartState("chart");
+                }
+
+                buildChart(data);
+                updateInsights(data);
+
+                // 3. Kick off Gemini analysis in parallel (non-blocking for chart)
+                try {
+                    const geminiRes = await fetchGeminiAnalysis(
+                        data,
+                        productName,
+                    );
+                    if (geminiRes.ok && geminiRes.analysis) {
+                        renderGeminiAnalysis(geminiRes.analysis);
+                    } else {
+                        // API returned fallback
+                        renderGeminiAnalysis(geminiRes.analysis);
+                    }
+                } catch (geminiErr) {
+                    console.error("Gemini analysis failed:", geminiErr);
+                    // Show fallback gracefully
+                    renderGeminiAnalysis({
+                        score: 50,
+                        verdict: "Neutral",
+                        verdict_emoji: "➖",
+                        description:
+                            "AI analysis is temporarily unavailable. Please try again shortly.",
+                        breakdown: {
+                            vs_target: {
+                                score: 50,
+                                label: "Unavailable",
+                                color: "#928374",
+                            },
+                            vs_lowest: {
+                                score: 50,
+                                label: "Unavailable",
+                                color: "#928374",
+                            },
+                            vs_average: {
+                                score: 50,
+                                label: "Unavailable",
+                                color: "#928374",
+                            },
+                        },
+                        trend: "unknown",
+                        recommendation: "Try refreshing the analysis.",
+                        confidence: 0,
+                    });
+                }
+            } catch (err) {
+                console.error("Price history fetch failed:", err);
+                showChartState("empty");
+                chartEmpty.querySelector(".ph-no-data-text").textContent =
+                    "Failed to load price history. Please try again.";
+                resetDealCard();
+            }
+        }
+
+        /* ── Product dropdown ────────────────────────────────────── */
+        const phSelect = document.getElementById("phProductSelect");
+        if (phSelect) {
+            phSelect.addEventListener("change", function () {
+                const id = this.value;
+                if (!id) {
+                    if (phChart) {
+                        phChart.destroy();
+                        phChart = null;
+                    }
+                    showChartState("empty");
+                    chartEmpty.querySelector(".ph-no-data-text").textContent =
+                        "Select a product to load its real price trend";
+                    resetInsights();
+                    resetDealCard();
+                    dataMeta.style.display = "none";
+                    return;
+                }
+                updateDashboard(id, currentDays);
+            });
+
+            // Auto-select if only one product with price exists
+            const validOptions = phSelect.querySelectorAll(
+                "option[value]:not([value=''])",
+            );
+            if (validOptions.length === 1) {
+                phSelect.value = validOptions[0].value;
+                phSelect.dispatchEvent(new Event("change"));
+            }
+        }
+
+        /* ── Time range buttons ──────────────────────────────────── */
+        document.querySelectorAll(".ph-time-btn").forEach((btn) => {
+            btn.addEventListener("click", function () {
+                document
+                    .querySelectorAll(".ph-time-btn")
+                    .forEach((b) => b.classList.remove("active"));
+                this.classList.add("active");
+                currentDays = parseInt(this.dataset.range);
+                if (activeProductId)
+                    updateDashboard(activeProductId, currentDays);
+            });
+        });
+    }); // end DOMContentLoaded
 </script>
 
 {% endblock %}

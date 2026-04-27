@@ -1,4 +1,3 @@
-# app/__init__.py
 import os
 
 from dotenv import load_dotenv
@@ -10,12 +9,11 @@ load_dotenv()
 
 
 def create_app():
-    # Get the project root (one level above the 'app' folder)
+    # Get the project root
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
     app = Flask(
         __name__,
-        # Tell Flask exactly where templates and static are
         template_folder=os.path.join(project_root, "templates"),
         static_folder=os.path.join(project_root, "static"),
     )
@@ -27,14 +25,13 @@ def create_app():
             "No SECRET_KEY set for Flask application. Check your .env file."
         )
 
-    # --- UPDATED: Point database to the persistent instance folder ---
+    # --- DATABASE RESET ---
     instance_path = os.path.join(project_root, "instance")
-    os.makedirs(
-        instance_path, exist_ok=True
-    )  # Safely create the folder if it's missing
-    db_path = os.path.join(instance_path, "products.db")
+    os.makedirs(instance_path, exist_ok=True)
+
+    # Updated to products_v2.db to accommodate the new history table
+    db_path = os.path.join(instance_path, "products_v2.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
-    # -----------------------------------------------------------------
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
